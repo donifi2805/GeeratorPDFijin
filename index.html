@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Surat Keterangan Dokter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="form-container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Generator Surat Keterangan Dokter</h1>
+        <p class="text-center text-gray-500 mb-8">Isi formulir di bawah ini untuk membuat surat keterangan dokter, lalu unduh sebagai PDF.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="patientName" class="block text-sm font-medium text-gray-700">Nama Pasien</label>
+                <input type="text" id="patientName" value="Yelli Putri Yanti" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="dob" class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
+                <input type="text" id="dob" value="15 September 2005" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="medicalRecord" class="block text-sm font-medium text-gray-700">Nomor Rekam Medis</label>
+                <input type="text" id="medicalRecord" value="G9365-005153" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="registrationNumber" class="block text-sm font-medium text-gray-700">Nomor Registrasi</label>
+                <input type="text" id="registrationNumber" value="770864111858" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div class="md:col-span-2">
+                <label for="medicationInfo" class="block text-sm font-medium text-gray-700">Keterangan (Obat)</label>
+                <textarea id="medicationInfo" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">Meclizine 6 tablet, 2x1 Tablet sesudah makan (25mg)
+Flunarizine 6 tablet, 1x1 Tablet sesudah makan malam (5mg)
+Domperidone 9 tablet, 3x1 Tablet sebelum makan (10mg)</textarea>
+            </div>
+            <div class="md:col-span-2">
+                <label for="diagnosis" class="block text-sm font-medium text-gray-700">Keterangan Diagnosa</label>
+                <input type="text" id="diagnosis" value="Benign paroxysmal positional vertigo (BPPV)" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="restStartDate" class="block text-sm font-medium text-gray-700">Mulai Istirahat</label>
+                <input type="text" id="restStartDate" value="29-08-2025" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="restEndDate" class="block text-sm font-medium text-gray-700">Selesai Istirahat</label>
+                <input type="text" id="restEndDate" value="29-08-2025" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+             <div>
+                <label for="restDuration" class="block text-sm font-medium text-gray-700">Lama Istirahat (hari)</label>
+                <input type="number" id="restDuration" value="1" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-center">
+            <button id="generatePdf" class="w-full md:w-auto inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                Buat dan Unduh PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden container for PDF generation -->
+    <div id="pdf-content" class="w-[800px] p-10 bg-white text-black" style="position: absolute; left: -9999px; font-family: 'Times New Roman', Times, serif;">
+        <div class="header flex items-start justify-between mb-4 border-b-4 border-black pb-2">
+            <div class="flex items-center">
+                 <!-- FIX: Changed src to local file -->
+                 <img src="logo.png" alt="Klinik Logo" class="h-20 w-auto mr-4">
+                <span class="text-xl font-bold">KLINIK PRATAMA ASRINA</span>
+            </div>
+            <div class="text-right text-xs">
+                <p class="font-bold">KLINIK PRATAMA ASRINA</p>
+                <p>Jl. Kol. Sunandar No.33, Rendole Indah,</p>
+                <p>Muktiharjo, Kec. Margorejo, Kabupaten Pati, Jawa</p>
+                <p>Tengah 59163</p>
+                <p>Telp. 085192746483</p>
+            </div>
+        </div>
+        
+        <div class="text-center my-6">
+            <h2 class="text-xl font-bold underline">SURAT KETERANGAN DOKTER</h2>
+            <p class="text-sm">19677/SKD/08/2025</p>
+        </div>
+
+        <p class="mb-4 text-sm">Berdasarkan hasil pemeriksaan dokter dengan informasi pasien di bawah ini:</p>
+
+        <table class="text-sm w-full mb-4">
+            <tbody>
+                <tr>
+                    <td class="w-1/4 py-1">Nama</td>
+                    <td class="w-auto">: <span id="pdf-patientName"></span></td>
+                </tr>
+                <tr>
+                    <td class="py-1">Tanggal lahir</td>
+                    <td>: <span id="pdf-dob"></span></td>
+                </tr>
+                <tr>
+                    <td class="py-1">Nomor rekam medis</td>
+                    <td>: <span id="pdf-medicalRecord"></span></td>
+                </tr>
+                <tr>
+                    <td class="py-1">Nomor registrasi</td>
+                    <td>: <span id="pdf-registrationNumber"></span></td>
+                </tr>
+                 <tr>
+                    <td class="align-top py-1">Keterangan</td>
+                    <td class="align-top">: <span id="pdf-medicationInfo" class="whitespace-pre-line"></span></td>
+                </tr>
+                <tr>
+                    <td class="py-1">Keterangan diagnosa</td>
+                    <td>: <span id="pdf-diagnosis"></span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="text-sm mb-6">Untuk di berikan istirahat karena sakit selama <span id="pdf-restDuration"></span> hari Terhitung Mulai Dari tanggal <span id="pdf-restStartDate"></span> sampai tanggal <span id="pdf-restEndDate"></span>.</p>
+
+        <p class="text-sm mb-8">Demikian surat keterangan ini di buat dengan sebenarnya Untuk di pergunakan sebagaimana mestinya.</p>
+
+        <div class="flex justify-end">
+            <div class="text-center text-sm">
+                <p>Pati, 28-08-2025</p>
+                <p>Dokter Yang Memeriksa</p>
+                <!-- FIX: Changed src to local file -->
+                <img src="qr.png" alt="QR Code" class="w-24 h-24 mx-auto my-2">
+                <p class="font-bold underline">DR.Yulana Saputri</p>
+                <p>SIP.DPM.PTSP/57244.29561/DU/077/059/164/III/2025</p>
+            </div>
+        </div>
+
+        <div class="mt-12 border-t pt-2">
+            <p class="text-xs italic">Dokumen ini telah di validasi dan di cetak otomatis oleh system serta tidak di gunakan tanda tangan identik</p>
+        </div>
+    </div>
+
+
+    <script>
+        document.getElementById('generatePdf').addEventListener('click', function () {
+            // Update PDF content from form
+            document.getElementById('pdf-patientName').innerText = document.getElementById('patientName').value;
+            document.getElementById('pdf-dob').innerText = document.getElementById('dob').value;
+            document.getElementById('pdf-medicalRecord').innerText = document.getElementById('medicalRecord').value;
+            document.getElementById('pdf-registrationNumber').innerText = document.getElementById('registrationNumber').value;
+            document.getElementById('pdf-medicationInfo').innerText = document.getElementById('medicationInfo').value;
+            document.getElementById('pdf-diagnosis').innerText = document.getElementById('diagnosis').value;
+            document.getElementById('pdf-restDuration').innerText = document.getElementById('restDuration').value;
+            document.getElementById('pdf-restStartDate').innerText = document.getElementById('restStartDate').value;
+            document.getElementById('pdf-restEndDate').innerText = document.getElementById('restEndDate').value;
+
+            const { jsPDF } = window.jspdf;
+            const pdfContent = document.getElementById('pdf-content');
+            
+            // Show the element before capturing
+            pdfContent.style.left = '0';
+
+            html2canvas(pdfContent, { 
+                scale: 2,
+                useCORS: true // Good practice, even for local files in some browser contexts
+            }).then(canvas => {
+                // Hide the element after capturing
+                pdfContent.style.left = '-9999px';
+
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'p',
+                    unit: 'px',
+                    format: [canvas.width, canvas.height]
+                });
+                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                
+                const patientName = document.getElementById('patientName').value.replace(/\s+/g, '_');
+                pdf.save(`Surat_Keterangan_${patientName}.pdf`);
+            }).catch(err => {
+                console.error("Gagal membuat PDF:", err);
+                pdfContent.style.left = '-9999px'; // Ensure it's hidden on error too
+            });
+        });
+    </script>
+
+</body>
+</html>
